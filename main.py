@@ -6,6 +6,7 @@ from kivy.lang import Builder
 from time import sleep
 from threading import Thread
 import random
+import requests
 
 class MainWindow(Screen):
     pass
@@ -17,17 +18,33 @@ class DownloadWindow(Screen):
 
     download_thread = Thread()
 
-    def display_progress(self):
-        self.progressText.text = str(self.progressBar.value) + "%"
+    def display_progress(self, total, current): # In bytes
+        current_mb = round(current/1024/1024, 1)
+        total_mb = round(total/1024/1024, 1)
+        
+
+        string = f"Downloading {current_mb}mb of {total_mb}mb"
+
+        self.progressText.text = string
         
     def progress(self):
         self.backButton.disabled = True
-        while self.progressBar.value < 100:
-            sleep(0.1)
-            self.progressBar.value += random.randrange(0, 10)
-            self.display_progress()
-        else:
-            self.backButton.disabled = False
+        url = "https://download939.mediafire.com/k5fpolb08sag/vk3ubbajeidpjyf/Thirdym+v0.0.4-alpha.rar"
+        r = requests.get(url, stream=True)
+        with open("ThirdymGame.rar", "wb") as f:
+            total_progress = int(r.headers.get("content-length"))
+            progress = 0
+            for chunk in r.iter_content(chunk_size=1024):
+                f.write(chunk)
+                f.flush()
+
+                progress += len(chunk)
+
+                self.progressBar.value = progress/total_progress*100
+                self.display_progress(total_progress, progress)
+
+        self.backButton.disabled = False
+
 
     def begin_download(self):
         print("Downloading ...")
@@ -36,7 +53,7 @@ class DownloadWindow(Screen):
     def cancel_download(self):
         print("Download cancelled.")
         self.progressBar.value = 0
-        self.display_progress()
+        self.progressText.text = "Waiting for a request..."
         
 
 
