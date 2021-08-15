@@ -3,9 +3,8 @@ from kivy.uix.screenmanager import Screen, ScreenManager
 from kivy.properties import ObjectProperty
 from kivy.lang import Builder
 
-from time import sleep
 from threading import Thread
-import random
+from mediafiredl import MediafireDL as MF
 import requests
 
 class MainWindow(Screen):
@@ -29,7 +28,10 @@ class DownloadWindow(Screen):
         
     def progress(self):
         self.backButton.disabled = True
-        url = "https://download939.mediafire.com/k5fpolb08sag/vk3ubbajeidpjyf/Thirdym+v0.0.4-alpha.rar"
+
+        url = MF.GetFileLink("https://www.mediafire.com/file/vk3ubbajeidpjyf/Thirdym+v0.0.4-alpha.rar/file")
+        filename = MF.GetName(url)
+
         r = requests.get(url, stream=True)
         with open("ThirdymGame.rar", "wb") as f:
             total_progress = int(r.headers.get("content-length"))
