@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/Gann4/Gann4Launcher#readme",
   "dependencies": {
+    "decompress": "^4.2.1",
+    "decompress-zip": "^0.3.3",
     "electron": "^14.0.0",
     "request": "^2.88.2"
   }

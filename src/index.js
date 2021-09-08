@@ -1,16 +1,24 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const url = require("url");
 const path = require("path");
+
+var DecompressZip = require("decompress-zip");
+// var unzipper = new DecompressZip(filename)
+
 var request = require('request');
 var fs = require('fs');
 
 let mainWindow;
 let downloadWindow;
 
+let downloadTitle;
+let downloadFilename;
+
 app.on("ready", () => {
     mainWindow = new BrowserWindow({
-        width: 720,
-        height: 480,
+        width: 800,
+        height: 420,
+        frame: false,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
@@ -21,19 +29,53 @@ app.on("ready", () => {
         protocol: "file",
         slashes: true
     }))
+    mainWindow.setMenu(null);
+    mainWindow.setResizable(false);
 })
 
 ipcMain.on("download-file", (e, webFile) => {
-    fullpath = path.join(__dirname, webFile.path);
-    downloadFile(webFile.link, fullpath);
-
+    openProgressWindow();
+    
+    downloadFilename = nameFromLink(webFile.link);
+    downloadFile(webFile);
 })
 
-// Source: https://ourcodeworld.com/articles/read/228/how-to-download-a-webfile-with-electron-save-it-and-show-download-progress
-function downloadFile(file_url , targetPath){
+ipcMain.on("extract-game", () => {
+    openProgressWindow();
+    
+    downloadTitle = "Decompressing...";
+    downloadFilename = "Thirdym.v0.1.0.zip";
+
+    var unzipper = new DecompressZip(path.join(__dirname, "downloads/Thirdym.v0.1.0-alpha.zip"));
+
+    unzipper.on('error', function (err) {
+        console.log('Caught an error');
+    });
+    
+    unzipper.on('extract', function (log) {
+        console.log('Finished extracting');
+        downloadWindow.close()
+        downloadWindow = null;
+    });
+    
+    unzipper.on('progress', function (fileIndex, fileCount) {
+        console.log('Extracted file ' + (fileIndex + 1) + ' of ' + fileCount);
+        showProgress(fileIndex, fileCount);
+    });
+    
+    unzipper.extract({
+        path: path.join(__dirname, "downloads"),
+        filter: function (file) {
+            return file.type !== "SymbolicLink";
+        }
+    });
+})
+
+function openProgressWindow(){
     downloadWindow = new BrowserWindow({
         width: 400,
         height: 200,
+        frame: false,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
@@ -44,6 +86,20 @@ function downloadFile(file_url , targetPath){
         protocol: "file",
         slashes: true
     }))
+    downloadWindow.setMenu(null);
+    downloadWindow.setResizable(false);
+}
+
+function nameFromLink(link){
+    const slicedUrl = link.split("/"); 
+    const filename = slicedUrl[slicedUrl.length - 1];
+    return filename;
+}
+
+// Source: https://ourcodeworld.com/articles/read/228/how-to-download-a-webfile-with-electron-save-it-and-show-download-progress
+function downloadFile(webFile){
+    
+    downloadTitle = "Downloading..."
 
     // Save variable to know progress
     var received_bytes = 0;
@@ -51,33 +107,38 @@ function downloadFile(file_url , targetPath){
 
     var req = request({
         method: 'GET',
-        uri: file_url
+        uri: webFile.link
     });
 
-    var out = fs.createWriteStream(targetPath);
+    var out = fs.createWriteStream(path.join(webFile.filepath, nameFromLink(webFile.link)));
     req.pipe(out);
 
-    req.on('response', function ( data ) {
-        // Change the total bytes value to get progress later.
+    // Change the total bytes value to get progress later.
+    req.on('response', data => {
         total_bytes = parseInt(data.headers['content-length' ]);
     });
 
-    req.on('data', function(chunk) {
-        // Update the received bytes
+    // Update the received bytes
+    req.on('data', chunk => {
         received_bytes += chunk.length;
-
         showProgress(received_bytes, total_bytes);
     });
 
-    req.on('end', function() {
+    req.on('end', () => {
         console.log("File succesfully downloaded");
         downloadWindow.close();
+        mainWindow.webContents.send("download-finished");
     });
 }
 
-function showProgress(received,total){
+function showProgress(received, total) {
     var percentage = (received * 100) / total;
     console.log(percentage + "% | " + received + " bytes out of " + total + " bytes.");
 
-    downloadWindow.webContents.send("download-progress", percentage);
+    downloadProgress = {
+        progress: percentage,
+        title: downloadTitle,
+        filename: downloadFilename
+    };
+    downloadWindow.webContents.send("download-progress", downloadProgress);
 }

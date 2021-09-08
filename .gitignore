@@ -1,3 +1,5 @@
+src/downloads/*
+
 .DS_Store
 .env
 .gclient_done

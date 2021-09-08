@@ -6,13 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/thirdym.css">
 </head>
-<body class="bg-dark">
+<body class="bg-danger">
     <div class="container-fluid">
         <div class="container text-center">
-            <h5 class="my-5 text-white">Downloading Thirdym</h5>
-            <div class="progress progress-danger">
-                        
+            <h4 id="progress-title" class="my-2 text-white">Downloading...</h4>
+            <p class="my-5 text-muted" id="dl-filename">file.ext</p>
+            
+            <div class="my-3 progress">
+                
             </div>
         </div>
     </div>
@@ -20,16 +23,19 @@
     <script>
         const { ipcRenderer } = require("electron");
 
-        //const progressText = document.querySelector("#download-progress");
-
-        ipcRenderer.on("download-progress", (e, fileProgress) => {
-            fileProgress = parseInt(fileProgress);
-            const progressbar_section = document.querySelector("div.progress");
+        const progressTitle = document.querySelector("#progress-title");
+        const fileDisplay = document.querySelector("#dl-filename");
+        const progressbarSection = document.querySelector("div.progress");
+        
+        ipcRenderer.on("download-progress", (e, downloadProgress) => {
+            progress = parseInt(downloadProgress.progress);   
             const progressbar = `
-            <div class="progress-bar" role="progressbar" style="width: ${fileProgress}%;" aria-valuenow="${fileProgress}" aria-valuemin="0" aria-valuemax="100">${fileProgress}%</div>
+            <div class="progress-bar bg-danger" role="progressbar" style="width: ${progress}%;" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100">${progress}%</div>
             `;
-            
-            progressbar_section.innerHTML = progressbar;
+
+            progressTitle.innerHTML = downloadProgress.title;
+            fileDisplay.innerHTML = downloadProgress.filename;
+            progressbarSection.innerHTML = progressbar;
         })
     </script>
 </body>

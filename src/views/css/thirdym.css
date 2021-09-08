@@ -1,0 +1,14 @@
+html, body{
+    height: 100%;
+}
+body{
+    overflow-x: hidden;
+    overflow-y: hidden;
+
+    background-image: url("../img/thirdym-bg.png");
+    background-position: 0px 0px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    backdrop-filter: blur(10px);
+    z-index: -9;
+}
