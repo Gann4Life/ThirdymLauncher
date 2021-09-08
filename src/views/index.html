@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+</head>
+<body class="bg-dark">
+    <div class="container-fluid">
+        <div class="container text-center">
+            <h1 class="text-white my-5">Thirdym</h1>
+            <button onclick="downloadThirdym()" target="_blank" id="thirdym-download" type="button" class="btn btn-danger">Download</button>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require("electron");
+
+        function downloadThirdym() {
+            webFile = {
+                link: "https://github.com/Gann4/Thirdym/releases/download/0.1.0-alpha/Thirdym.v0.1.0-alpha.rar",
+                path: "downloads/Thirdym.rar"
+            };
+            ipcRenderer.send("download-file", webFile);
+        }
+    </script>
+</body>
+</html>

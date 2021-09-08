@@ -1,0 +1,24 @@
+{
+  "name": "Gann4Launcher",
+  "version": "0.0.1",
+  "description": "Application updater.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "electron src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gann4/Gann4Launcher.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Gann4/Gann4Launcher/issues"
+  },
+  "homepage": "https://github.com/Gann4/Gann4Launcher#readme",
+  "dependencies": {
+    "electron": "^14.0.0",
+    "request": "^2.88.2"
+  }
+}
