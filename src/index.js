@@ -5,6 +5,8 @@ var request = require('request');
 var fs = require('fs');
 
 let mainWindow;
+let downloadWindow;
+
 app.on("ready", () => {
     mainWindow = new BrowserWindow({
         width: 720,
@@ -29,6 +31,20 @@ ipcMain.on("download-file", (e, webFile) => {
 
 // Source: https://ourcodeworld.com/articles/read/228/how-to-download-a-webfile-with-electron-save-it-and-show-download-progress
 function downloadFile(file_url , targetPath){
+    downloadWindow = new BrowserWindow({
+        width: 400,
+        height: 200,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        }
+    })
+    downloadWindow.loadURL(url.format({
+        pathname: path.join(__dirname, "views/download-progress.html"),
+        protocol: "file",
+        slashes: true
+    }))
+
     // Save variable to know progress
     var received_bytes = 0;
     var total_bytes = 0;
@@ -55,10 +71,13 @@ function downloadFile(file_url , targetPath){
 
     req.on('end', function() {
         console.log("File succesfully downloaded");
+        downloadWindow.close();
     });
 }
 
 function showProgress(received,total){
     var percentage = (received * 100) / total;
     console.log(percentage + "% | " + received + " bytes out of " + total + " bytes.");
+
+    downloadWindow.webContents.send("download-progress", percentage);
 }

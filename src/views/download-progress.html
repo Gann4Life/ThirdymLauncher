@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+</head>
+<body class="bg-dark">
+    <div class="container-fluid">
+        <div class="container text-center">
+            <h5 class="my-5 text-white">Downloading Thirdym</h5>
+            <div class="progress progress-danger">
+                        
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require("electron");
+
+        //const progressText = document.querySelector("#download-progress");
+
+        ipcRenderer.on("download-progress", (e, fileProgress) => {
+            fileProgress = parseInt(fileProgress);
+            const progressbar_section = document.querySelector("div.progress");
+            const progressbar = `
+            <div class="progress-bar" role="progressbar" style="width: ${fileProgress}%;" aria-valuenow="${fileProgress}" aria-valuemin="0" aria-valuemax="100">${fileProgress}%</div>
+            `;
+            
+            progressbar_section.innerHTML = progressbar;
+        })
+    </script>
+</body>
+</html>
