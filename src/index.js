@@ -27,6 +27,7 @@ ipcMain.on("download-file", (e, webFile) => {
 
 })
 
+// Source: https://ourcodeworld.com/articles/read/228/how-to-download-a-webfile-with-electron-save-it-and-show-download-progress
 function downloadFile(file_url , targetPath){
     // Save variable to know progress
     var received_bytes = 0;
