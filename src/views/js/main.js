@@ -1,6 +1,7 @@
 const { ipcRenderer } = require("electron");
 const path = require("path");
 const fs = require("fs");
+const request = require("request");
 
 const downloadButton = document.querySelector("#dl-button");
 const playButton = document.querySelector("#play-button");
@@ -20,9 +21,13 @@ function playGame() {
 }
 
 function downloadThirdym() {
-    const webFile = {
-        link: "https://github.com/Gann4/Thirdym/releases/download/0.1.0-alpha/Thirdym.v0.1.0-alpha.zip",
-        filepath: path.join(__dirname, "../downloads"),
-    };
-    ipcRenderer.send("download-file", webFile);
+    downloadButton.classList.add("d-none");
+    request("http://gann4life.ga/json/data.json", {json: true}, (error, response, body) => {
+        if (!error && response.statusCode == 200) {
+            const webFile = { link: body.games.thirdym.download };
+            ipcRenderer.send("download-file", webFile);
+        } else {
+            return console.log(error);
+        }
+    });
 }

@@ -5,22 +5,13 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const url = require("url");
 const path = require("path");
 
-var DecompressZip = require("decompress-zip");
+const DecompressZip = require("decompress-zip");
 // var unzipper = new DecompressZip(filename)
 
 const request = require('request');
 const fs = require('fs');
 
-let weburl = "http://gann4life.ga/json/data.json"
-
-// JSON USAGE TEMPLATE
-// request(weburl, {json: true}, (err, res, body) => {
-//     if (!err && res.statusCode == 200) {
-//         console.log("JSON  \n\n" + body.games.thirdym.version);
-//     } else {
-//         return console.log(err);
-//     }
-// });
+let downloadsFolder = path.join(__dirname, "versions");
 
 let mainWindow;
 let downloadWindow;
@@ -52,6 +43,7 @@ ipcMain.on("download-file", (e, webFile) => {
     openProgressWindow();
     
     downloadFilename = nameFromLink(webFile.link);
+    
     downloadFile(webFile);
 })
 
@@ -60,9 +52,7 @@ ipcMain.on("extract-game", () => {
     openProgressWindow();
     
     downloadTitle = "Decompressing...";
-    downloadFilename = "Thirdym.v0.1.0.zip";
-
-    var unzipper = new DecompressZip(path.join(__dirname, "downloads/Thirdym.v0.1.0-alpha.zip"));
+    var unzipper = new DecompressZip(path.join(downloadsFolder, downloadFilename));
 
     unzipper.on('error', function (err) {
         console.log('Caught an error');
@@ -72,6 +62,7 @@ ipcMain.on("extract-game", () => {
         console.log('Finished extracting');
         downloadWindow.close()
         downloadWindow = null;
+        fs.unlinkSync(path.join(downloadsFolder, downloadFilename));
     });
     
     unzipper.on('progress', function (fileIndex, fileCount) {
@@ -80,7 +71,7 @@ ipcMain.on("extract-game", () => {
     });
     
     unzipper.extract({
-        path: path.join(__dirname, "downloads"),
+        path: downloadsFolder,
         filter: function (file) {
             return file.type !== "SymbolicLink";
         }
@@ -112,17 +103,28 @@ function nameFromLink(link){
     return filename;
 }
 
+function getJsonFromURL(link){
+    const options = { json: true };
+    return request(link, options, (error, response, body) => {
+        if (!error && response.statusCode == 200) {
+            return body;
+        } else {
+            return console.log(error);
+        }
+    });
+}
+
 function checkVersionsFolder() {
-    if (fs.existsSync(path.join(__dirname, "versions"))) {
+    if (fs.existsSync(downloadsFolder)) {
         console.log("'versions' EXISTS IN '" + __dirname + "'");
     } else {
         console.log("'versions' NOT FOUND. CREATING 'versions' FOLDER IN '" + __dirname + "'");
-        fs.mkdir(path.join(__dirname, "versions"), (err) => {
+        fs.mkdir(downloadsFolder), (err) => {
             if (err) {
                 return console.log(err);
             }
-            console.log("'versions' WAS CREATED IN '" + __dirname + "'")
-        });
+            console.log("'versions' WAS CREATED IN '" + __dirname + "'");
+        };
     }
 }
 
@@ -140,7 +142,7 @@ function downloadFile(webFile){
         uri: webFile.link
     });
 
-    var out = fs.createWriteStream(path.join(webFile.filepath, nameFromLink(webFile.link)));
+    var out = fs.createWriteStream(path.join(downloadsFolder, downloadFilename));
     req.pipe(out);
 
     // Change the total bytes value to get progress later.

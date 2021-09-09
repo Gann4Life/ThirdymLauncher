@@ -1,4 +1,4 @@
-src/downloads/*
+src/versions/*
 
 .DS_Store
 .env
