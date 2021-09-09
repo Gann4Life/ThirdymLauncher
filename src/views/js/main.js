@@ -2,7 +2,6 @@ const { ipcRenderer } = require("electron");
 const path = require("path");
 const fs = require("fs");
 
-
 const downloadButton = document.querySelector("#dl-button");
 const playButton = document.querySelector("#play-button");
 
@@ -10,7 +9,7 @@ ipcRenderer.on("download-finished", () => {
     downloadButton.classList.add("d-none");
     playButton.classList.remove("d-none");
     extractGame();
-})
+});
 
 function extractGame() {
     ipcRenderer.send("extract-game");

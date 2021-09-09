@@ -1,3 +1,6 @@
+// See https://stackoverflow.com/questions/36515099/how-to-package-an-electron-app-into-a-single-executable/58044211
+// for single EXE build.
+
 const { app, BrowserWindow, ipcMain } = require("electron");
 const url = require("url");
 const path = require("path");
@@ -5,8 +8,8 @@ const path = require("path");
 var DecompressZip = require("decompress-zip");
 // var unzipper = new DecompressZip(filename)
 
-var request = require('request');
-var fs = require('fs');
+const request = require('request');
+const fs = require('fs');
 
 let mainWindow;
 let downloadWindow;
@@ -15,6 +18,7 @@ let downloadTitle;
 let downloadFilename;
 
 app.on("ready", () => {
+    checkVersionsFolder();
     mainWindow = new BrowserWindow({
         width: 800,
         height: 420,
@@ -40,6 +44,7 @@ ipcMain.on("download-file", (e, webFile) => {
     downloadFile(webFile);
 })
 
+// Documentation: https://www.npmjs.com/package/decompress-zip
 ipcMain.on("extract-game", () => {
     openProgressWindow();
     
@@ -94,6 +99,20 @@ function nameFromLink(link){
     const slicedUrl = link.split("/"); 
     const filename = slicedUrl[slicedUrl.length - 1];
     return filename;
+}
+
+function checkVersionsFolder() {
+    if (fs.existsSync(path.join(__dirname, "versions"))) {
+        console.log("'versions' EXISTS IN '" + __dirname + "'");
+    } else {
+        console.log("'versions' NOT FOUND. CREATING 'versions' FOLDER IN '" + __dirname + "'");
+        fs.mkdir(path.join(__dirname, "versions"), (err) => {
+            if (err) {
+                return console.log(err);
+            }
+            console.log("'versions' WAS CREATED IN '" + __dirname + "'")
+        });
+    }
 }
 
 // Source: https://ourcodeworld.com/articles/read/228/how-to-download-a-webfile-with-electron-save-it-and-show-download-progress

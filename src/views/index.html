@@ -9,12 +9,21 @@
     <link rel="stylesheet" href="css/thirdym.css">
 </head>
 <body class="bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-danger bg-danger">
+        <div class="container-fluid">
+            <h5 class="mx-5 text-decoration-none text-white" href="#">Thirdym Client</h5>
+            <div class="justify-content-end">
+                <a class="btn btn-danger text-white active" aria-current="page" href="#">Play</a>
+                <a class="btn btn-danger disabled">Changelogs</a>
+            </div>
+        </div>
+    </nav>
+
     <div class="container-fluid">
         <div class="container text-center">
-            <h1 class="text-white my-5">Thirdym</h1>
-            <button id="dl-button" onclick="downloadThirdym()" class="btn btn-danger">Download</button>
-            <button id="play-button" onclick="playGame()" class="btn btn-danger d-none">Play</button>
-            <!-- <button onclick="extractGame()" class="btn btn-warning">Extract game</button> -->
+            <h1 class="text-white py-5 border-bottom border-danger">Play Thirdym</h1>
+            <button id="dl-button" onclick="downloadThirdym()" class="my-5 btn btn-danger">Download</button>
+            <button id="play-button" onclick="playGame()" class="my-5 btn btn-danger d-none">Play</button>
         </div>
     </div>
     <script src="js/main.js"></script>
