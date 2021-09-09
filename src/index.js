@@ -11,6 +11,17 @@ var DecompressZip = require("decompress-zip");
 const request = require('request');
 const fs = require('fs');
 
+let weburl = "http://gann4life.ga/json/data.json"
+
+// JSON USAGE TEMPLATE
+// request(weburl, {json: true}, (err, res, body) => {
+//     if (!err && res.statusCode == 200) {
+//         console.log("JSON  \n\n" + body.games.thirdym.version);
+//     } else {
+//         return console.log(err);
+//     }
+// });
+
 let mainWindow;
 let downloadWindow;
 
