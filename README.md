@@ -1,2 +1,2 @@
-# Gann4Launcher
+# Thirdym Launcher
  
