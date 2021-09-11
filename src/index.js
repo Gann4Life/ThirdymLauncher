@@ -2,14 +2,11 @@
 // for single EXE build.
 
 const { app, BrowserWindow, ipcMain } = require("electron");
-const url = require("url");
-const path = require("path");
-
 const DecompressZip = require("decompress-zip");
-// var unzipper = new DecompressZip(filename)
-
-const request = require('request');
 const fs = require('fs');
+const path = require("path");
+const request = require('request');
+const url = require("url");
 
 let downloadsFolder = path.join(__dirname, "versions");
 
@@ -20,7 +17,9 @@ let downloadTitle;
 let downloadFilename;
 
 app.on("ready", () => {
-    checkVersionsFolder();
+    verifyVersionsFolder();
+    verifyGameInstallation();
+
     mainWindow = new BrowserWindow({
         width: 800,
         height: 420,
@@ -60,6 +59,7 @@ ipcMain.on("extract-game", () => {
     
     unzipper.on('extract', function (log) {
         console.log('Finished extracting');
+        mainWindow.webContents.send("extract-finish");
         downloadWindow.close()
         downloadWindow = null;
         fs.unlinkSync(path.join(downloadsFolder, downloadFilename));
@@ -97,24 +97,35 @@ function openProgressWindow(){
     downloadWindow.setResizable(false);
 }
 
+function arrayContains(needle, arrhaystack)
+{
+    var hasNeedleBeenFound = false;
+    arrhaystack.forEach(item => {
+        if (item.includes(needle)) {
+            hasNeedleBeenFound = true;
+        }
+    });
+    return hasNeedleBeenFound;
+}
+
 function nameFromLink(link){
     const slicedUrl = link.split("/"); 
     const filename = slicedUrl[slicedUrl.length - 1];
     return filename;
 }
 
-function getJsonFromURL(link){
+function getJsonFromURL(link, callback) {
     const options = { json: true };
-    return request(link, options, (error, response, body) => {
+    request(link, options, (error, response, body) => {
         if (!error && response.statusCode == 200) {
-            return body;
+            callback(body);
         } else {
             return console.log(error);
         }
     });
 }
 
-function checkVersionsFolder() {
+function verifyVersionsFolder() {
     if (fs.existsSync(downloadsFolder)) {
         console.log("'versions' EXISTS IN '" + __dirname + "'");
     } else {
@@ -125,6 +136,22 @@ function checkVersionsFolder() {
             }
             console.log("'versions' WAS CREATED IN '" + __dirname + "'");
         };
+    }
+}
+
+function verifyGameInstallation() {
+    var needsToUpdate;
+    if (fs.existsSync(downloadsFolder)) {
+        fs.readdir(downloadsFolder, (err, files) => {
+            getJsonFromURL("http://gann4life.ga/json/data.json", res => {
+                const lastGameVersion = res.games.thirdym.version;
+                needsToUpdate = !arrayContains(lastGameVersion, files);
+                mainWindow.webContents.send("requires-update", {
+                    required: needsToUpdate,
+                    version: lastGameVersion
+                });
+            });
+        });
     }
 }
 

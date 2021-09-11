@@ -7,9 +7,21 @@ const downloadButton = document.querySelector("#dl-button");
 const playButton = document.querySelector("#play-button");
 
 ipcRenderer.on("download-finished", () => {
-    downloadButton.classList.add("d-none");
-    playButton.classList.remove("d-none");
     extractGame();
+});
+
+ipcRenderer.on("extract-finish", () => {
+    playButton.classList.remove("d-none");
+})
+
+ipcRenderer.on("requires-update", (e, gamedata) => {
+    const downloadButton = document.querySelector("#dl-button");
+    if (gamedata.required) {
+        downloadButton.classList.remove("d-none");
+        downloadButton.innerHTML = "Download v" + gamedata.version;
+    } else {
+        document.querySelector("#play-button").classList.remove("d-none");
+    }
 });
 
 function extractGame() {
@@ -17,7 +29,7 @@ function extractGame() {
 }
 
 function playGame() {
-
+    
 }
 
 function downloadThirdym() {

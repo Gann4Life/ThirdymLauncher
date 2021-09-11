@@ -9,23 +9,37 @@
     <link rel="stylesheet" href="css/thirdym.css">
 </head>
 <body class="bg-dark">
+
+    <!-- Navigation (header) bar -->
     <nav class="navbar navbar-expand-lg navbar-danger bg-danger">
         <div class="container-fluid">
             <h5 class="mx-5 text-decoration-none text-white" href="#">Thirdym Client</h5>
             <div class="justify-content-end">
-                <a class="btn btn-danger text-white active" aria-current="page" href="#">Play</a>
-                <a class="btn btn-danger disabled">Changelogs</a>
+                <a id="navbtn" tab-display="tab-play" class="btn btn-danger" aria-current="page" href="#">Play</a>
+                <a id="navbtn" tab-display="tab-changelogs" class="btn btn-danger">Changelogs</a>
             </div>
         </div>
     </nav>
-
-    <div class="container-fluid">
+    
+    <!-- Play (main) tab -->
+    <div tab-display="tab-play" class="container-fluid">
         <div class="container text-center">
-            <h1 class="text-white py-5 border-bottom border-danger">Play Thirdym</h1>
-            <button id="dl-button" onclick="downloadThirdym()" class="my-5 btn btn-danger">Download</button>
-            <button id="play-button" onclick="playGame()" class="my-5 btn btn-danger d-none">Play</button>
+            <h1 class="text-white py-5 border-bottom border-danger">Play</h1>
+            
+            <button class="my-5 btn btn-danger d-none" id="dl-button" onclick="downloadThirdym()">Download</button>
+            <button class="my-5 btn btn-danger d-none" id="play-button" onclick="playGame()">Play</button>
         </div>
     </div>
+
+    <!-- Changelogs tab -->
+    <div tab-display="tab-changelogs" class="container-fluid d-none">
+        <div class="container text-center">
+            <h1 class="text-white py-5 border-bottom border-danger">Changelogs</h1>
+            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Deleniti nesciunt, iusto possimus pariatur vitae dolorum voluptate velit itaque, accusantium cupiditate, adipisci officia tenetur reprehenderit voluptatum recusandae explicabo! Eaque, aliquid? Dicta!</p>
+        </div>
+    </div>
+
     <script src="js/main.js"></script>
+    <script src="js/navbar.js"></script>
 </body>
 </html>
