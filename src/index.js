@@ -130,12 +130,12 @@ function verifyVersionsFolder() {
         console.log("'versions' EXISTS IN '" + __dirname + "'");
     } else {
         console.log("'versions' NOT FOUND. CREATING 'versions' FOLDER IN '" + __dirname + "'");
-        fs.mkdir(downloadsFolder), (err) => {
+        fs.mkdir(downloadsFolder, (err) => {
             if (err) {
                 return console.log(err);
             }
             console.log("'versions' WAS CREATED IN '" + __dirname + "'");
-        };
+        });
     }
 }
 
