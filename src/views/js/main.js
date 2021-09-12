@@ -29,7 +29,25 @@ function extractGame() {
 }
 
 function playGame() {
-    
+    ipcRenderer.send("play-game");
+}
+
+function removeAll() {
+    ipcRenderer.send("remove-all-versions");
+    addClass_toElement_("d-none", playButton);
+    removeClass_fromElement_("d-none", downloadButton);
+}
+
+function addClass_toElement_(classToAdd, element) {
+    if (!element.classList.contains(classToAdd)) {
+        element.classList.add(classToAdd);
+    }
+}
+
+function removeClass_fromElement_(classToRemove, element) {
+    if (element.classList.contains(classToRemove)) {
+        element.classList.remove(classToRemove);
+    }
 }
 
 function downloadThirdym() {

@@ -3,6 +3,7 @@
 
 const { app, BrowserWindow, ipcMain } = require("electron");
 const DecompressZip = require("decompress-zip");
+const exec = require("child_process").execFile;
 const fs = require('fs');
 const path = require("path");
 const request = require('request');
@@ -38,6 +39,27 @@ app.on("ready", () => {
     mainWindow.setResizable(false);
 })
 
+ipcMain.on("play-game", () => {
+    getJsonFromURL("http://gann4life.ga/json/data.json", res => {
+        fs.readdir(downloadsFolder, (err, gameFolders) => {
+            gameFolders.forEach(gameFolder => {
+                fs.readdir(path.join(downloadsFolder, gameFolder), (err, gameFiles) => {
+                    gameFiles.forEach(gameFile => {
+                        if (gameFile.toLowerCase().startsWith("thirdym") && gameFile.endsWith(".exe") && gameFolder.includes(res.games.thirdym.version))
+                        {
+                            var gameExecutablePath = path.join(downloadsFolder, gameFolder, gameFile);
+                            exec(gameExecutablePath, (err, data) => {
+                                console.log(err);
+                                console.log(data);
+                            });
+                        }
+                    });
+                });
+            });
+        });
+    });
+});
+
 ipcMain.on("download-file", (e, webFile) => {
     openProgressWindow();
     
@@ -62,6 +84,7 @@ ipcMain.on("extract-game", () => {
         mainWindow.webContents.send("extract-finish");
         downloadWindow.close()
         downloadWindow = null;
+        console.log("REMOVING " + downloadFilename);
         fs.unlinkSync(path.join(downloadsFolder, downloadFilename));
     });
     
@@ -76,7 +99,17 @@ ipcMain.on("extract-game", () => {
             return file.type !== "SymbolicLink";
         }
     });
-})
+});
+
+ipcMain.on("remove-all-versions", () => {
+    fs.readdir(downloadsFolder, (err, gameFolders) => {
+        gameFolders.forEach(gameFolder => {
+            fs.rmdir(path.join(downloadsFolder, gameFolder), {recursive: true}, (err) => {
+                console.log(err);
+            });
+        });
+    });
+});
 
 function openProgressWindow(){
     downloadWindow = new BrowserWindow({
